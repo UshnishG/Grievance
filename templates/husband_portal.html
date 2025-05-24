@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Husband Portal - Grievance Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+        
+        .header-card {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .grievance-card {
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .grievance-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .priority-high {
+            border-left: 5px solid #dc3545;
+        }
+        
+        .priority-medium {
+            border-left: 5px solid #ffc107;
+        }
+        
+        .priority-low {
+            border-left: 5px solid #28a745;
+        }
+        
+        .status-open {
+            background-color: #ffeaa7;
+            color: #2d3436;
+        }
+        
+        .status-in-progress {
+            background-color: #74b9ff;
+            color: white;
+        }
+        
+        .status-resolved {
+            background-color: #00b894;
+            color: white;
+        }
+        
+        .btn-action {
+            margin: 0.2rem;
+        }
+        
+        .no-grievances {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .date-text {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="card header-card">
+            <div class="card-body text-center">
+                <h1 class="card-title">
+                    <i class="fas fa-heart"></i> Husband Portal
+                </h1>
+                <p class="card-text">Welcome, {{ username }}! Manage Puchu's grievances with love and care.</p>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <h3>{{ grievances|selectattr('status', 'equalto', 'Open')|list|length }}</h3>
+                    <p>Open</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <h3>{{ grievances|selectattr('status', 'equalto', 'In Progress')|list|length }}</h3>
+                    <p>In Progress</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <h3>{{ grievances|selectattr('status', 'equalto', 'Resolved')|list|length }}</h3>
+                    <p>Resolved</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <h3>{{ grievances|length }}</h3>
+                    <p>Total</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grievances List -->
+        {% if grievances %}
+            {% for grievance in grievances %}
+            <div class="card grievance-card priority-{{ grievance.priority.lower() }}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ grievance.grievance_type }}</strong>
+                        <span class="badge ms-2 status-{{ grievance.status.lower().replace(' ', '-') }}">
+                            {{ grievance.status }}
+                        </span>
+                        <span class="badge bg-secondary ms-1">
+                            {{ grievance.priority }} Priority
+                        </span>
+                    </div>
+                    <small class="date-text">
+                        <i class="fas fa-clock"></i> 
+                        {{ grievance.date_submitted }}
+                    </small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6>Description:</h6>
+                            <p>{{ grievance.description }}</p>
+                            
+                            {% if grievance.additional_context %}
+                            <h6>Additional Context:</h6>
+                            <p class="text-muted">{{ grievance.additional_context }}</p>
+                            {% endif %}
+                            
+                            {% if grievance.husband_notes %}
+                            <h6>Your Notes:</h6>
+                            <p class="text-info">{{ grievance.husband_notes }}</p>
+                            {% endif %}
+                            
+                            {% if grievance.date_resolved %}
+                            <small class="text-success">
+                                <i class="fas fa-check-circle"></i> 
+                                Resolved on {{ grievance.date_resolved }}
+                            </small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-grid gap-2">
+                                {% if grievance.status != 'Resolved' %}
+                                <button class="btn btn-primary btn-action" 
+                                        onclick="updateStatus('{{ grievance.id }}', 'In Progress')">
+                                    <i class="fas fa-play"></i> Mark In Progress
+                                </button>
+                                <button class="btn btn-success btn-action" 
+                                        onclick="resolveGrievance('{{ grievance.id }}')">
+                                    <i class="fas fa-check"></i> Mark Resolved
+                                </button>
+                                {% endif %}
+                                <button class="btn btn-info btn-action" 
+                                        onclick="addNotes('{{ grievance.id }}')">
+                                    <i class="fas fa-sticky-note"></i> Add Notes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="card">
+                <div class="card-body no-grievances">
+                    <i class="fas fa-heart fa-4x text-muted mb-3"></i>
+                    <h4>No grievances yet!</h4>
+                    <p>Puchu is happy, or she hasn't submitted any grievances yet. 💕</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Notes Modal -->
+    <div class="modal fade" id="notesModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Notes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="notesText" class="form-control" rows="4" 
+                              placeholder="Add your notes about this grievance..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveNotes()">Save Notes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolve Modal -->
+    <div class="modal fade" id="resolveModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-check-circle"></i> Resolve Grievance
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>How did you resolve this grievance? (Optional)</p>
+                    <textarea id="resolveNotes" class="form-control" rows="3" 
+                              placeholder="Describe how you addressed Puchu's concern..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="confirmResolve()">
+                        <i class="fas fa-heart"></i> Mark as Resolved
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentGrievanceId = null;
+
+        function updateStatus(id, status) {
+            fetch('/update_grievance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: id,
+                    status: status
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error updating grievance: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating grievance');
+            });
+        }
+
+        function addNotes(id) {
+            currentGrievanceId = id;
+            document.getElementById('notesText').value = '';
+            new bootstrap.Modal(document.getElementById('notesModal')).show();
+        }
+
+        function saveNotes() {
+            const notes = document.getElementById('notesText').value;
+            
+            fetch('/update_grievance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: currentGrievanceId,
+                    status: 'In Progress',
+                    notes: notes
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('notesModal')).hide();
+                    location.reload();
+                } else {
+                    alert('Error saving notes: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving notes');
+            });
+        }
+
+        function resolveGrievance(id) {
+            currentGrievanceId = id;
+            document.getElementById('resolveNotes').value = '';
+            new bootstrap.Modal(document.getElementById('resolveModal')).show();
+        }
+
+        function confirmResolve() {
+            const notes = document.getElementById('resolveNotes').value;
+            
+            fetch('/update_grievance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: currentGrievanceId,
+                    status: 'Resolved',
+                    notes: notes
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('resolveModal')).hide();
+                    location.reload();
+                } else {
+                    alert('Error resolving grievance: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error resolving grievance');
+            });
+        }
+
+        window.addEventListener("beforeunload", function () {
+    navigator.sendBeacon("/logout");
+  });
+
+    </script>
+</body>
+</html>

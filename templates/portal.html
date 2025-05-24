@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puchu's Portal 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (min-width: 768px) {
+            .header {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+        }
+
+        .welcome-msg {
+            color: #4a5568;
+        }
+
+        .welcome-msg h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        @media (min-width: 768px) {
+            .welcome-msg h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        .welcome-msg p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .welcome-msg p {
+                font-size: 1rem;
+            }
+        }
+
+        .logout-btn {
+            background: #e53e3e;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            background: #c53030;
+            transform: translateY(-1px);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @media (min-width: 768px) {
+            .card {
+                padding: 30px;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card h2 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .card h2 {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        @media (min-width: 768px) {
+            .card p {
+                font-size: 1rem;
+            }
+        }
+
+        .chatbot-section {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            .chatbot-section {
+                height: 500px;
+            }
+        }
+
+        .chat-messages {
+            flex: 1;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
+            overflow-y: auto;
+            background: #f7fafc;
+            max-height: 250px;
+        }
+
+        @media (min-width: 768px) {
+            .chat-messages {
+                padding: 15px;
+                max-height: 350px;
+            }
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 85%;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .message {
+                padding: 12px;
+                max-width: 80%;
+                font-size: 1rem;
+            }
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .chat-input-area {
+                gap: 10px;
+            }
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        @media (min-width: 768px) {
+            .chat-input {
+                padding: 12px;
+            }
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        @media (min-width: 768px) {
+            .send-btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+        }
+
+        .send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .form-group {
+                margin-bottom: 20px;
+            }
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-group label {
+                margin-bottom: 8px;
+                font-size: 1rem;
+            }
+        }
+
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f7fafc;
+            transition: all 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .form-group select,
+            .form-group input,
+            .form-group textarea {
+                padding: 12px;
+            }
+        }
+
+        .form-group select:focus,
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        @media (min-width: 768px) {
+            .form-group textarea {
+                min-height: 100px;
+            }
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .submit-btn {
+                padding: 15px;
+                font-size: 16px;
+            }
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
+        }
+
+        .flash-messages {
+            margin-bottom: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .flash-messages {
+                margin-bottom: 20px;
+            }
+        }
+
+        .flash-success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 4px solid #38a169;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .flash-success {
+                padding: 15px;
+                font-size: 1rem;
+            }
+        }
+
+        .flash-error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 4px solid #e53e3e;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .flash-error {
+                padding: 15px;
+                font-size: 1rem;
+            }
+        }
+
+        .typing-indicator {
+            display: none;
+            color: #718096;
+            font-style: italic;
+            padding: 8px;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .typing-indicator {
+                padding: 10px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Grievances List Styles */
+        .grievances-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        @media (min-width: 768px) {
+            .grievances-list {
+                max-height: 500px;
+            }
+        }
+
+        .grievance-item {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        @media (min-width: 768px) {
+            .grievance-item {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+        }
+
+        .grievance-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .grievance-header {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        @media (min-width: 480px) {
+            .grievance-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: flex-start;
+            }
+        }
+
+        .grievance-type {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.85rem;
+        }
+
+        @media (min-width: 768px) {
+            .grievance-type {
+                font-size: 0.9rem;
+            }
+        }
+
+        .grievance-date {
+            font-size: 0.75rem;
+            color: #718096;
+        }
+
+        @media (min-width: 768px) {
+            .grievance-date {
+                font-size: 0.8rem;
+            }
+        }
+
+        .grievance-description {
+            color: #4a5568;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .grievance-description {
+                font-size: 1rem;
+            }
+        }
+
+        .grievance-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.75rem;
+        }
+
+        @media (min-width: 480px) {
+            .grievance-footer {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .grievance-footer {
+                font-size: 0.8rem;
+            }
+        }
+
+        .grievance-priority {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .grievance-priority {
+                font-size: 0.75rem;
+            }
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .status-badge {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Priority colors */
+        .priority-high {
+            border-left-color: #e53e3e;
+        }
+        .priority-high .grievance-priority {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .priority-medium {
+            border-left-color: #ed8936;
+        }
+        .priority-medium .grievance-priority {
+            background: #feebc8;
+            color: #c05621;
+        }
+
+        .priority-low {
+            border-left-color: #38a169;
+        }
+        .priority-low .grievance-priority {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        /* Status colors */
+        .status-open {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .status-in-progress {
+            background: #feebc8;
+            color: #c05621;
+        }
+
+        .status-resolved {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .husband-notes {
+            background: #e6fffa;
+            border: 1px solid #b2f5ea;
+            border-radius: 8px;
+            padding: 8px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #234e52;
+        }
+
+        @media (min-width: 768px) {
+            .husband-notes {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+        }
+
+        .husband-notes-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #2d3748;
+        }
+
+        .no-grievances {
+            text-align: center;
+            color: #718096;
+            font-style: italic;
+            padding: 30px 15px;
+            font-size: 0.9rem;
+        }
+
+        @media (min-width: 768px) {
+            .no-grievances {
+                padding: 40px 20px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Touch-friendly improvements for mobile */
+        @media (max-width: 767px) {
+            button, .logout-btn, .send-btn, .submit-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .chat-input, .form-group input, .form-group select, .form-group textarea {
+                min-height: 44px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="welcome-msg">
+            <h1>Welcome back, {{ username }}! 💕</h1>
+            <p>Your safe space is ready for you 🌸</p>
+        </div>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-{{ category }}">{{ message|safe }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="main-content">
+        <!-- Chatbot Section -->
+        <div class="card">
+            <h2>💭 Talk it Through</h2>
+            <p style="color: #718096; margin-bottom: 20px;">
+                Share what's on your mind. I'm here to help you think through things and feel better.
+            </p>
+            
+            <div class="chatbot-section">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        Hi Puchu! 💕 I'm here to listen and help you work through whatever is on your mind. What would you like to talk about today?
+                    </div>
+                </div>
+                
+                <div class="typing-indicator" id="typingIndicator">
+                    AI is thinking... 💭
+                </div>
+                
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
+                    <button onclick="sendMessage()" class="send-btn">Send 💬</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grievance Form Section -->
+        <div class="card">
+            <h2>📝 Share Your Concerns</h2>
+            <p style="color: #718096; margin-bottom: 20px;">
+                If you need Ushnish's direct attention, fill out this form and he'll get your message right away.
+            </p>
+            
+            <form method="POST" action="/submit_grievance">
+                <div class="form-group">
+                    <label for="grievance_type">What's this about?</label>
+                    <select id="grievance_type" name="grievance_type" required>
+                        <option value="">Choose a category...</option>
+                        <option value="Relationship Concern">Relationship Concern 💕</option>
+                        <option value="Feeling Misunderstood">Feeling Misunderstood 😔</option>
+                        <option value="Need Support">Need Support 🤗</option>
+                        <option value="Communication Issue">Communication Issue 💬</option>
+                        <option value="Just Want to Share">Just Want to Share 🌸</option>
+                        <option value="Urgent Matter">Urgent Matter ⚡</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="priority">How urgent is this?</label>
+                    <select id="priority" name="priority" required>
+                        <option value="">Select priority...</option>
+                        <option value="Low - When you have time">Low - When you have time 💚</option>
+                        <option value="Medium - Soon please">Medium - Soon please 🧡</option>
+                        <option value="High - Need you now">High - Need you now ❤️</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Tell me what's happening</label>
+                    <textarea id="description" name="description" required placeholder="Share your thoughts, feelings, or what's bothering you. I'm listening 💕"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="additional_context">Anything else you want me to know?</label>
+                    <textarea id="additional_context" name="additional_context" placeholder="Any additional details, context, or just anything else on your mind..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    Send to Ushnish 💌
+                </button>
+            </form>
+        </div>
+
+        <!-- Grievances History Section -->
+        <div class="card">
+            <h2>📋 Your Messages to Ushnish</h2>
+            <p style="color: #718096; margin-bottom: 20px;">
+                Here's what you've shared and how Ushnish has responded.
+            </p>
+            
+            <div class="grievances-list">
+                {% if grievances %}
+                    {% for grievance in grievances %}
+                        <div class="grievance-item 
+                            {% if 'High' in grievance.priority %}priority-high
+                            {% elif 'Medium' in grievance.priority %}priority-medium
+                            {% else %}priority-low{% endif %}">
+                            
+                            <div class="grievance-header">
+                                <span class="grievance-type">{{ grievance.grievance_type }}</span>
+                                <span class="grievance-date">
+                                    {{ grievance.date_submitted.split(' ')[0] if grievance.date_submitted else 'Recent' }}
+                                </span>
+                            </div>
+                            
+                            <div class="grievance-description">
+                                {{ grievance.description }}
+                                {% if grievance.additional_context %}
+                                    <br><br><em>{{ grievance.additional_context }}</em>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="grievance-footer">
+                                <span class="grievance-priority">
+                                    {% if 'High' in grievance.priority %}🔴 High Priority
+                                    {% elif 'Medium' in grievance.priority %}🟡 Medium Priority
+                                    {% else %}🟢 Low Priority{% endif %}
+                                </span>
+                                
+                                <span class="status-badge 
+                                    {% if grievance.status == 'Open' %}status-open
+                                    {% elif grievance.status == 'In Progress' %}status-in-progress
+                                    {% else %}status-resolved{% endif %}">
+                                    {{ grievance.status }}
+                                </span>
+                            </div>
+                            
+                            {% if grievance.husband_notes %}
+                                <div class="husband-notes">
+                                    <div class="husband-notes-label">💕 Ushnish's Response:</div>
+                                    {{ grievance.husband_notes }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-grievances">
+                        No messages sent yet. 💕<br>
+                        When you share something with Ushnish, it will appear here.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Show typing indicator
+            document.getElementById('typingIndicator').style.display = 'block';
+            
+            // Send to chatbot
+            fetch('/chatbot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide typing indicator
+                document.getElementById('typingIndicator').style.display = 'none';
+                
+                if (data.response) {
+                    addMessage(data.response, 'bot');
+                } else {
+                    addMessage('I\'m having trouble connecting right now. Please try again or reach out to Ushnish directly. 💕', 'bot');
+                }
+            })
+            .catch(error => {
+                // Hide typing indicator
+                document.getElementById('typingIndicator').style.display = 'none';
+                addMessage('Something went wrong. I\'m here when you\'re ready to try again. 💕', 'bot');
+            });
+        }
+        
+        function addMessage(text, sender) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Auto-scroll to bottom of chat on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+
+        window.addEventListener("beforeunload", function () {
+    navigator.sendBeacon("/logout");
+  });
+    </script>
+</body>
+</html>

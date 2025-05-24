@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .welcome-header {
+            margin-bottom: 30px;
+        }
+
+        .welcome-header h1 {
+            color: #4a5568;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .welcome-header p {
+            color: #718096;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .note {
+            margin-top: 25px;
+            padding: 15px;
+            background: linear-gradient(135deg, #fef5e7 0%, #f6e05e 100%);
+            border-radius: 10px;
+            color: #744210;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .emoji {
+            font-size: 1.5rem;
+            margin: 0 5px;
+        }
+
+        .login-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .quick-login {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f7fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-login:hover {
+            border-color: #667eea;
+            background: white;
+        }
+
+        .quick-login h4 {
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        .quick-login p {
+            color: #718096;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="welcome-header">
+            <h1>Welcome to Your Portal <span class="emoji">💕</span></h1>
+            <p>Choose your access level</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-error">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/login" id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+
+            <button type="submit" class="login-btn">
+                Login <span class="emoji">🌸</span>
+            </button>
+        </form>
+
+        <div class="login-options">
+            <div class="quick-login" onclick="fillWifeLogin()">
+                <h4>💕 Puchu</h4>
+                <p>Submit & manage grievances</p>
+            </div>
+            <div class="quick-login" onclick="fillHusbandLogin()">
+                <h4>💪 Hubby</h4>
+                <p>View & resolve grievances</p>
+            </div>
+        </div>
+
+        <div class="note">
+            <strong>Two Portal System <span class="emoji">💖</span></strong><br>
+            <strong>Wifey Portal:</strong> Submit grievances, chat with Hubby<br>
+            <strong>Hubby Portal:</strong> View, manage, and resolve grievances
+        </div>
+    </div>
+
+    <script>
+        function fillWifeLogin() {
+            document.getElementById('username').value = 'Wifey';
+            document.getElementById('password').focus();
+        }
+
+        function fillHusbandLogin() {
+            document.getElementById('username').value = 'Hubby';
+            document.getElementById('password').focus();
+        }
+    </script>
+</body>
+</html>
