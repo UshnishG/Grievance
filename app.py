@@ -10,28 +10,37 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY')
+app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-here')
 
 # Twilio Configuration
-TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
-TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
-TWILIO_PHONE = os.getenv('TWILIO_PHONE')
-YOUR_PHONE = os.getenv('YOUR_PHONE')
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'AC9b3eb15fd53562eb95fa147d87144bbb')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '752adf8cae239254736c0224d26e3495')
+TWILIO_PHONE = os.getenv('TWILIO_PHONE', '+19472148038')
+YOUR_PHONE = os.getenv('YOUR_PHONE', '+917810982910')
 
 # Gmail Configuration
-GMAIL_USER = os.getenv('GMAIL_USER')
-GMAIL_PASSWORD = os.getenv('GMAIL_PASSWORD')
-RECIPIENT_EMAIL = os.getenv('RECIPIENT_EMAIL')
+GMAIL_USER = os.getenv('GMAIL_USER', 'ghosalushnish@gmail.com')
+GMAIL_PASSWORD = os.getenv('GMAIL_PASSWORD', 'ejke fgvu yqcj hjqq')
+RECIPIENT_EMAIL = os.getenv('RECIPIENT_EMAIL', 'ushnishghosalgenai@gmail.com')
 
 # Gemini AI Configuration
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyAhP_YoIRSRkclMeRJaOQk_5Z4Bh9JAjXo')
 GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent'
 
 # Database Configuration
-DATABASE = os.getenv('DATABASE', 'grievances.db')
+DATABASE = os.path.join(os.getcwd(), os.getenv('DATABASE', 'grievances.db'))
 
 def init_db():
     """Initialize the database with required tables"""
+    # Ensure the database directory exists and is writable
+    db_dir = os.path.dirname(os.path.abspath(DATABASE))
+    if not os.path.exists(db_dir):
+        os.makedirs(db_dir)
+    
+    # Check if we can write to the directory
+    if not os.access(db_dir, os.W_OK):
+        print(f"Warning: No write permission to database directory: {db_dir}")
+    
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     
@@ -53,65 +62,98 @@ def init_db():
     
     conn.commit()
     conn.close()
+    
+    # Set file permissions to be readable and writable
+    try:
+        os.chmod(DATABASE, 0o666)
+    except:
+        pass
 
 def get_db_connection():
-    """Get database connection"""
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    return conn
+    """Get database connection with error handling"""
+    try:
+        conn = sqlite3.connect(DATABASE, timeout=20.0)
+        conn.row_factory = sqlite3.Row
+        # Enable WAL mode for better concurrent access
+        conn.execute('PRAGMA journal_mode=WAL;')
+        return conn
+    except sqlite3.Error as e:
+        print(f"Database connection error: {e}")
+        raise
 
 def add_grievance_to_db(grievance_type, priority, description, additional_context, submitted_by):
     """Add a new grievance to the database"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        INSERT INTO grievances (grievance_type, priority, description, additional_context, submitted_by)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (grievance_type, priority, description, additional_context, submitted_by))
-    
-    grievance_id = cursor.lastrowid
-    conn.commit()
-    conn.close()
-    
-    return grievance_id
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT INTO grievances (grievance_type, priority, description, additional_context, submitted_by)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (grievance_type, priority, description, additional_context, submitted_by))
+        
+        grievance_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        return grievance_id
+    except sqlite3.Error as e:
+        print(f"Database insert error: {e}")
+        if 'conn' in locals():
+            conn.close()
+        raise Exception(f"Database error: {str(e)}")
 
 def get_all_grievances():
     """Get all grievances from database"""
-    conn = get_db_connection()
-    grievances = conn.execute('''
-        SELECT * FROM grievances 
-        ORDER BY date_submitted DESC
-    ''').fetchall()
-    conn.close()
-    return grievances
+    try:
+        conn = get_db_connection()
+        grievances = conn.execute('''
+            SELECT * FROM grievances 
+            ORDER BY date_submitted DESC
+        ''').fetchall()
+        conn.close()
+        return grievances
+    except sqlite3.Error as e:
+        print(f"Database select error: {e}")
+        if 'conn' in locals():
+            conn.close()
+        return []
 
 def update_grievance_status(grievance_id, status, notes=None):
     """Update grievance status and add husband notes"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    if status == 'Resolved':
-        cursor.execute('''
-            UPDATE grievances 
-            SET status = ?, husband_notes = ?, date_resolved = CURRENT_TIMESTAMP
-            WHERE id = ?
-        ''', (status, notes, grievance_id))
-    else:
-        cursor.execute('''
-            UPDATE grievances 
-            SET status = ?, husband_notes = ?
-            WHERE id = ?
-        ''', (status, notes, grievance_id))
-    
-    conn.commit()
-    conn.close()
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        if status == 'Resolved':
+            cursor.execute('''
+                UPDATE grievances 
+                SET status = ?, husband_notes = ?, date_resolved = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ''', (status, notes, grievance_id))
+        else:
+            cursor.execute('''
+                UPDATE grievances 
+                SET status = ?, husband_notes = ?
+                WHERE id = ?
+            ''', (status, notes, grievance_id))
+        
+        conn.commit()
+        conn.close()
+        return True
+        
+    except sqlite3.Error as e:
+        print(f"Database update error: {e}")
+        if 'conn' in locals():
+            conn.close()
+        raise Exception(f"Database error: {str(e)}")
 
 # Initialize Twilio client
 try:
     twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 except Exception as e:
     twilio_client = None
+    print(f"Twilio initialization error: {e}")
 
 # Initialize database
 init_db()
@@ -181,6 +223,7 @@ def send_grievance_notification():
         )
         return True
     except Exception as e:
+        print(f"Failed to send SMS: {str(e)}")
         return False
 
 @app.route('/')
@@ -250,7 +293,8 @@ def update_grievance():
         return jsonify({'success': True, 'message': 'Grievance updated successfully!'})
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Error updating grievance: {str(e)}")
+        return jsonify({'error': f'Error updating grievance: {str(e)}'}), 500
 
 @app.route('/chatbot', methods=['POST'])
 def chatbot():
@@ -297,12 +341,13 @@ def chatbot():
             return jsonify({'error': 'Sorry, I had trouble connecting to my thoughts. Try again?'})
             
     except Exception as e:
+        print(f"Chatbot error: {str(e)}")
         return jsonify({'error': 'Something went wrong. I\'m here when you\'re ready to try again.'})
 
 @app.route('/submit_grievance', methods=['POST'])
 def submit_grievance():
     if 'logged_in' not in session or session.get('user_type') != 'wife':
-        return redirect(url_for('index'))
+        return redirect(url_for('portal'))
     
     try:
         # Get form data with validation
@@ -349,6 +394,7 @@ def submit_grievance():
             flash('Your grievance has been saved! Ushnish can view it in his portal.', 'success')
         
     except Exception as e:
+        print(f"Error submitting grievance: {str(e)}")
         flash(f'Error submitting grievance: {str(e)}', 'error')
     
     return redirect(url_for('portal'))
@@ -359,7 +405,6 @@ def logout():
     if request.method == 'POST':
         return '', 204  # No content for sendBeacon
     return redirect(url_for('index'))
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
