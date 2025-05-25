@@ -10,21 +10,21 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-here')
+app.secret_key = os.getenv('SECRET_KEY')
 
 # Twilio Configuration
-TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', 'AC9b3eb15fd53562eb95fa147d87144bbb')
-TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '752adf8cae239254736c0224d26e3495')
-TWILIO_PHONE = os.getenv('TWILIO_PHONE', '+19472148038')
-YOUR_PHONE = os.getenv('YOUR_PHONE', '+917810982910')
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE = os.getenv('TWILIO_PHONE')
+YOUR_PHONE = os.getenv('YOUR_PHONE')
 
 # Gmail Configuration
-GMAIL_USER = os.getenv('GMAIL_USER', 'ghosalushnish@gmail.com')
-GMAIL_PASSWORD = os.getenv('GMAIL_PASSWORD', 'ejke fgvu yqcj hjqq')
-RECIPIENT_EMAIL = os.getenv('RECIPIENT_EMAIL', 'ushnishghosalgenai@gmail.com')
+GMAIL_USER = os.getenv('GMAIL_USER')
+GMAIL_PASSWORD = os.getenv('GMAIL_PASSWORD')
+RECIPIENT_EMAIL = os.getenv('RECIPIENT_EMAIL')
 
 # Gemini AI Configuration
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyAhP_YoIRSRkclMeRJaOQk_5Z4Bh9JAjXo')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent'
 
 # Database Configuration
