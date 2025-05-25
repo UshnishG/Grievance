@@ -867,10 +867,6 @@
             const chatMessages = document.getElementById('chatMessages');
             chatMessages.scrollTop = chatMessages.scrollHeight;
         });
-
-        window.addEventListener("beforeunload", function () {
-    navigator.sendBeacon("/logout");
-  });
     </script>
 </body>
 </html>
